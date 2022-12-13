@@ -8,7 +8,7 @@ import torch.optim as optim
 import pytorch_lightning as pl
 from project.datamodules.nmnist import NMNISTDataModule
 
-from project.lenet5_module import Lenet5Module
+from project.fer_module import FerModule
 
 
 def main():
@@ -34,7 +34,7 @@ def main():
         # TODO: add any data you want to report here
         # here, we put the model's hyperparameters and the resulting val accuracy
         report.write(
-            f"SpikingLeNet5 {args.timesteps} {args.bias} {args.neuron_model} {args.learning_rate}  {trainer.checkpoint_callback.best_model_score}\n")
+            f"{args.timesteps} {args.bias} {args.neuron_model} {args.learning_rate}  {trainer.checkpoint_callback.best_model_score}\n")
     elif args.mode == "lr_find":
         lr_finder = trainer.tuner.lr_find(module, datamodule=datamodule)
         fig = lr_finder.plot(suggest=True)
@@ -49,7 +49,7 @@ def create_module(args) -> pl.LightningModule:
     dict_args = vars(args)
 
     # TODO: you can change the module class here
-    module = Lenet5Module(**dict_args)
+    module = FerModule(**dict_args)
 
     return module
 
@@ -87,9 +87,6 @@ def get_args():
                         help="Path of a checkpoint file. Defaults to None, meaning the training/testing will start from scratch.")
     parser.add_argument('--batch_size', type=int, default=32)
     parser.add_argument('--timesteps', type=int, required=True)
-
-    # Args for model
-    parser = Lenet5Module.add_model_specific_args(parser)
 
     # Args for Trainer
     parser = pl.Trainer.add_argparse_args(parser)
