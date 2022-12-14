@@ -8,16 +8,20 @@ from torch.nn import functional as F
 from spikingjelly.clock_driven import functional
 import torchmetrics
 from project.models.snn_models import SNNModule
-
+from project.models.models import CNNModule
 
 class FerModule(pl.LightningModule):
-    def __init__(self, learning_rate: float, timesteps: int, n_classes: int, epochs: int, **kwargs):
+    def __init__(self, learning_rate: float, timesteps: int, n_classes: int, epochs: int, mode="snn", **kwargs):
         super().__init__()
         self.save_hyperparameters()
         self.epochs = epochs
-        self.model = SNNModule(
-            2, timesteps=timesteps, output_all=False, n_classes=n_classes
-        )
+        
+        if "snn" in mode:
+            self.model = SNNModule(
+                2, timesteps=timesteps, output_all=False, n_classes=n_classes, mode=mode
+            )
+        else:
+            self.model = CNNModule(2, timesteps, n_classes)
 
     def forward(self, x):
         # (T, B, C, H, W) --> (B, num_classes)

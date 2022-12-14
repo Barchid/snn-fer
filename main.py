@@ -31,9 +31,10 @@ def train(
     fold_number: int,
     dataset: str,
     trans: list,
+    mode="snn"
 ):
     module = FerModule(
-        learning_rate=learning_rate, timesteps=timesteps, n_classes=6, epochs=epochs
+        learning_rate=learning_rate, timesteps=timesteps, n_classes=6, epochs=epochs, mode=mode
     )
 
     # saves the best model checkpoint based on the accuracy in the validation set
@@ -75,7 +76,7 @@ def train(
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     report.write(
-        f"{dt_string} MODE=SNN DATASET={dataset} FOLD={fold_number} ACC={checkpoint_callback.best_model_score} TRANS={trans}\n"
+        f"{dt_string} MODE={mode} DATASET={dataset} FOLD={fold_number} ACC={checkpoint_callback.best_model_score} TRANS={trans}\n"
     )
     report.flush()
     report.close()
@@ -132,7 +133,7 @@ def compare(mode: str = "snn", trans: list = []):
             print(f"|TRAIN SET|={len(train_set)}")
             print(f"|VAL SET|={len(val_set)}")
 
-            acc = train(train_loader, val_loader, fold_number, dataset, trans)
+            acc = train(train_loader, val_loader, fold_number, dataset, trans, mode=mode)
             accs[fold_number] = acc
             glob_accs.append(acc)
 
