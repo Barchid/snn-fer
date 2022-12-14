@@ -134,6 +134,7 @@ if __name__ == "__main__":
     poss_trans = list(
         powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop", "transrot", "event_drop_2"])
     )
+    print(len(poss_trans))
     
     for curr in poss_trans:
         compare(mode="snn", trans=list(curr))
