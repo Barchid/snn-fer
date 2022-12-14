@@ -45,7 +45,7 @@ def train(
     trainer = pl.Trainer(
         max_epochs=epochs,
         gpus=torch.cuda.device_count(),
-        callbacks=[checkpoint_callback, EarlyStopping(monitor="val_acc", mode="max", patience=75)],
+        callbacks=[checkpoint_callback, EarlyStopping(monitor="val_acc", mode="max", patience=50)],
         logger=pl.loggers.TensorBoardLogger(
             "experiments/", name=f"{dataset}_{fold_number}"
         ),
