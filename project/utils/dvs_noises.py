@@ -22,7 +22,7 @@ from project.utils.drop_event import (
     drop_by_time_numpy,
     drop_event_numpy,
 )
-from project.utils.transform_dvs import CutPasteEvent, MovingOcclusion
+from project.utils.transform_dvs import CutPasteEvent
 
 
 @dataclass(frozen=True)
