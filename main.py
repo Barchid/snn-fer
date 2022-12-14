@@ -14,6 +14,7 @@ from project.fer_module import FerModule
 from project.utils.transforms import DVSTransform
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import math
+from itertools import chain, combinations
 
 batch_size = 32
 learning_rate = 5e-3
@@ -121,8 +122,24 @@ def compare(mode: str = "snn", trans: list = []):
 
             train(train_loader, val_loader, fold_number, dataset, trans)
 
+def powerset(iterable):
+    "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
+    s = list(iterable)
+    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
 if __name__ == "__main__":
     # seeds the random from numpy, pytorch, etc for reproductibility
     pl.seed_everything(1234)
-    compare(mode="snn", trans=[])
+    
+    poss_trans = list(
+        powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop", "transrot", "event_drop_2"])
+    )
+    
+    for curr in poss_trans:
+        compare(mode="snn", trans=list(curr))
+    
+    compare(mode="snn", trans=["background_activity"])
+    
+    compare(mode="snn", trans=["background_activity", "flip"])
+    
+    
