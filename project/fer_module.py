@@ -13,6 +13,7 @@ from project.models.snn_models import SNNModule
 class FerModule(pl.LightningModule):
     def __init__(self, learning_rate: float, timesteps: int, n_classes: int, **kwargs):
         super().__init__()
+        self.save_hyperparameters()
 
         self.model = SNNModule(
             2, timesteps=timesteps, output_all=False, n_classes=n_classes
