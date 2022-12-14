@@ -79,7 +79,7 @@ def compare(mode: str = "snn", trans: list = []):
         sensor_size=FerDVS.sensor_size,
         timesteps=timesteps,
         transforms_list=trans,
-        concat_time_channels=mode == "snn",
+        concat_time_channels=mode == "cnn",
     )
 
     for dataset in FerDVS.available_datasets:
@@ -106,7 +106,7 @@ def compare(mode: str = "snn", trans: list = []):
                     FerDVS.sensor_size,
                     timesteps=timesteps,
                     transforms_list=[],
-                    concat_time_channels=mode == "snn",
+                    concat_time_channels=mode == "cnn",
                 ),
             )
             val_loader = DataLoader(
