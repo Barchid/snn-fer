@@ -29,7 +29,7 @@ def train(
     dataset: str,
     trans: list,
 ):
-    module = FerModule(learning_rate=learning_rate, timesteps=timesteps, n_classes=6)
+    module = FerModule(learning_rate=learning_rate, timesteps=timesteps, n_classes=6, epochs=epochs)
 
     # saves the best model checkpoint based on the accuracy in the validation set
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
