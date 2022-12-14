@@ -12,6 +12,7 @@ from datetime import datetime
 from project.datamodules.fer_dvs import FerDVS
 from project.fer_module import FerModule
 from project.utils.transforms import DVSTransform
+from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 
 batch_size = 32
 learning_rate = 5e-3
@@ -42,7 +43,7 @@ def train(
     trainer = pl.Trainer(
         max_epochs=epochs,
         gpus=torch.cuda.device_count(),
-        callbacks=[checkpoint_callback],
+        callbacks=[checkpoint_callback, EarlyStopping(monitor="val_acc", mode="max", patience=75)],
         logger=pl.loggers.TensorBoardLogger(
             "experiments/", name=f"{dataset}_{fold_number}"
         ),
