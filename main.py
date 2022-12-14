@@ -15,6 +15,7 @@ from project.utils.transforms import DVSTransform
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import math
 from itertools import chain, combinations
+import numpy as np
 
 batch_size = 32
 learning_rate = 5e-3
@@ -31,7 +32,9 @@ def train(
     dataset: str,
     trans: list,
 ):
-    module = FerModule(learning_rate=learning_rate, timesteps=timesteps, n_classes=6, epochs=epochs)
+    module = FerModule(
+        learning_rate=learning_rate, timesteps=timesteps, n_classes=6, epochs=epochs
+    )
 
     # saves the best model checkpoint based on the accuracy in the validation set
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
@@ -45,7 +48,10 @@ def train(
     trainer = pl.Trainer(
         max_epochs=epochs,
         gpus=torch.cuda.device_count(),
-        callbacks=[checkpoint_callback, EarlyStopping(monitor="val_acc", mode="max", patience=50)],
+        callbacks=[
+            checkpoint_callback,
+            EarlyStopping(monitor="val_acc", mode="max", patience=50),
+        ],
         logger=pl.loggers.TensorBoardLogger(
             "experiments/", name=f"{dataset}_{fold_number}"
         ),
@@ -84,7 +90,10 @@ def compare(mode: str = "snn", trans: list = []):
         concat_time_channels=mode == "cnn",
     )
 
+    glob_accs = []
+
     for dataset in FerDVS.available_datasets:
+        accs = np.zeros(10, dtype=float)
         for i in range(10):
             fold_number = i
             train_set = FerDVS(
@@ -94,9 +103,12 @@ def compare(mode: str = "snn", trans: list = []):
                 fold=fold_number,
                 transform=transform,
             )
-            train_workers = math.ceil(len(train_set)/batch_size)
+            train_workers = math.ceil(len(train_set) / batch_size)
             train_loader = DataLoader(
-                train_set, batch_size=batch_size, shuffle=True, num_workers=train_workers
+                train_set,
+                batch_size=batch_size,
+                shuffle=True,
+                num_workers=train_workers,
             )
 
             val_set = FerDVS(
@@ -111,36 +123,59 @@ def compare(mode: str = "snn", trans: list = []):
                     concat_time_channels=mode == "cnn",
                 ),
             )
-            val_workers = math.ceil(len(val_set)/batch_size)
+            val_workers = math.ceil(len(val_set) / batch_size)
             val_loader = DataLoader(
                 val_set, batch_size=batch_size, shuffle=False, num_workers=val_workers
             )
-            
-            print(f'\n\nEXPERIENCE FOR DATASET={dataset} FOLD={fold_number}')
+
+            print(f"\n\nEXPERIENCE FOR DATASET={dataset} FOLD={fold_number}")
             print(f"|TRAIN SET|={len(train_set)}")
             print(f"|VAL SET|={len(val_set)}")
 
-            train(train_loader, val_loader, fold_number, dataset, trans)
+            acc = train(train_loader, val_loader, fold_number, dataset, trans)
+            accs[fold_number] = acc
+            glob_accs.append(acc)
+
+        report = open(f"report_{dataset}.txt", "a")
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
+        report.write(f"{dt_string} Mean of folds = {accs.mean()}\n\n")
+        report.flush()
+        report.close()
+
+    return sum(glob_accs) / len(glob_accs)
+
 
 def powerset(iterable):
     "powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"
     s = list(iterable)
     return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
 
+
 if __name__ == "__main__":
     # seeds the random from numpy, pytorch, etc for reproductibility
     pl.seed_everything(1234)
-    
+
     poss_trans = list(
-        powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop", "transrot", "event_drop_2"])
+        powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop"])
     )
     print(len(poss_trans))
-    
+
+    best_acc = -1
+    best_tran = []
     for curr in poss_trans:
-        compare(mode="snn", trans=list(curr))
+        acc = compare(mode="snn", trans=list(curr))
+        if acc >= best_acc:
+            best_acc = acc
+            best_tran = list(curr)
+            
+    print('BEST TRANS IS', best_tran)
     
-    compare(mode="snn", trans=["background_activity"])
+    curr = [*best_tran, "transrot"]
+    compare(mode="snn", trans=curr)
     
-    compare(mode="snn", trans=["background_activity", "flip"])
+    curr = [*best_tran, "event_drop_2"]
+    compare(mode="snn", trans=curr)
     
-    
+    curr = [*best_tran, "transrot", "event_drop_2"]
+    compare(mode="snn", trans=curr)
