@@ -86,7 +86,6 @@ def compare(mode: str = "snn", trans: list = []):
     for dataset in FerDVS.available_datasets:
         for i in range(10):
             fold_number = i
-            print(f'\n\nEXPERIENCE FOR DATASET={dataset} FOLD={fold_number}')
             train_set = FerDVS(
                 save_to="/datas/sandbox",
                 dataset=dataset,
@@ -115,6 +114,10 @@ def compare(mode: str = "snn", trans: list = []):
             val_loader = DataLoader(
                 val_set, batch_size=batch_size, shuffle=False, num_workers=val_workers
             )
+            
+            print(f'\n\nEXPERIENCE FOR DATASET={dataset} FOLD={fold_number}')
+            print(f"|TRAIN SET|={len(train_set)}")
+            print(f"|VAL SET|={len(val_set)}")
 
             train(train_loader, val_loader, fold_number, dataset, trans)
 
