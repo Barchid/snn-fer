@@ -13,7 +13,7 @@ from tonic import transforms as TF
 import numpy as np
 import random
 import tonic
-from project.utils.dvs_noises import EventDrop, EventDrop2, EventDrop3
+from project.utils.dvs_noises import EventDrop, EventDrop2
 from project.utils.transform_dvs import (
     BackgroundActivityNoise,
     ConcatTimeChannels,
