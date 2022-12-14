@@ -8,8 +8,8 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 from torchvision import transforms
-from torchvision.transforms import functional
 from tonic import transforms as TF
+from tonic.transforms import functional
 import numpy as np
 import random
 import tonic
