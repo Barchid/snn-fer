@@ -26,8 +26,7 @@ from project.utils.transform_dvs import (
     get_frame_representation,
 )
 
-
-class BarlowTwinsTransform:
+class DVSTransform:
     def __init__(
         self,
         sensor_size=None,
