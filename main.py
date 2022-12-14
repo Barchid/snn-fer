@@ -19,7 +19,7 @@ learning_rate = 5e-3
 timesteps = 8
 epochs = 1000
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-data_dir = "/datas/"
+data_dir = "/datas/sandbox"
 
 
 def train(
