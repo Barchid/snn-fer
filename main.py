@@ -101,7 +101,7 @@ def compare(mode: str = "snn", trans: list = []):
             val_set = FerDVS(
                 save_to="/datas/sandbox",
                 dataset=dataset,
-                train=True,
+                train=False,
                 fold=fold_number,
                 transform=DVSTransform(
                     FerDVS.sensor_size,
