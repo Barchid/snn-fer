@@ -63,7 +63,7 @@ def train(
         report.close()
         return -1
 
-    report = open(f"report_{dataset}_{fold_number}_{trans}.txt", "a")
+    report = open(f"report_{dataset}_{fold_number}.txt", "a")
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     report.write(
