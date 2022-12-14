@@ -13,6 +13,7 @@ from project.datamodules.fer_dvs import FerDVS
 from project.fer_module import FerModule
 from project.utils.transforms import DVSTransform
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
+import math
 
 batch_size = 32
 learning_rate = 5e-3
@@ -93,8 +94,9 @@ def compare(mode: str = "snn", trans: list = []):
                 fold=fold_number,
                 transform=transform,
             )
+            train_workers = math.ceil(len(train_set)/batch_size)
             train_loader = DataLoader(
-                train_set, batch_size=batch_size, shuffle=True, num_workers=4
+                train_set, batch_size=batch_size, shuffle=True, num_workers=train_workers
             )
 
             val_set = FerDVS(
@@ -109,8 +111,9 @@ def compare(mode: str = "snn", trans: list = []):
                     concat_time_channels=mode == "cnn",
                 ),
             )
+            val_workers = math.ceil(len(val_set)/batch_size)
             val_loader = DataLoader(
-                val_set, batch_size=batch_size, shuffle=False, num_workers=0
+                val_set, batch_size=batch_size, shuffle=False, num_workers=val_workers
             )
 
             train(train_loader, val_loader, fold_number, dataset, trans)
