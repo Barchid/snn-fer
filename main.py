@@ -50,7 +50,7 @@ def train(
     
     if ckpt is not None:
         print('Load CHECKPOINT')
-        module.model.encoder.load_state_dict(ckpt, strict=False)
+        module.model.encoder.load_state_dict(torch.load(ckpt), strict=False)
     
 
     # saves the best model checkpoint based on the accuracy in the validation set
