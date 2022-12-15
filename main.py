@@ -22,7 +22,14 @@ learning_rate = 5e-3
 timesteps = 8
 epochs = 1000
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-data_dir = "/datas/sandbox"
+
+if os.path.exists("data/FerDVS"):
+    data_dir = "data"
+    timesteps = 12
+    ckpt = "experiments/snn_dvsgesture.pt"
+else:
+    data_dir = "/datas/sandbox"
+    ckpt = None
 
 
 def train(
@@ -31,11 +38,20 @@ def train(
     fold_number: int,
     dataset: str,
     trans: list,
-    mode="snn"
+    mode="snn",
 ):
     module = FerModule(
-        learning_rate=learning_rate, timesteps=timesteps, n_classes=6, epochs=epochs, mode=mode
+        learning_rate=learning_rate,
+        timesteps=timesteps,
+        n_classes=6,
+        epochs=epochs,
+        mode=mode,
     )
+    
+    if ckpt is not None:
+        print('Load CHECKPOINT')
+        module.model.encoder.load_state_dict(ckpt, strict=False)
+    
 
     # saves the best model checkpoint based on the accuracy in the validation set
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
@@ -88,7 +104,7 @@ def compare(mode: str = "snn", trans: list = []):
         sensor_size=FerDVS.sensor_size,
         timesteps=timesteps,
         transforms_list=trans,
-        concat_time_channels=mode == "cnn",
+        concat_time_channels="cnn" in mode,
     )
 
     glob_accs = []
@@ -98,7 +114,7 @@ def compare(mode: str = "snn", trans: list = []):
         for i in range(10):
             fold_number = i
             train_set = FerDVS(
-                save_to="/datas/sandbox",
+                save_to=data_dir,
                 dataset=dataset,
                 train=True,
                 fold=fold_number,
@@ -113,7 +129,7 @@ def compare(mode: str = "snn", trans: list = []):
             )
 
             val_set = FerDVS(
-                save_to="/datas/sandbox",
+                save_to=data_dir,
                 dataset=dataset,
                 train=False,
                 fold=fold_number,
@@ -121,7 +137,7 @@ def compare(mode: str = "snn", trans: list = []):
                     FerDVS.sensor_size,
                     timesteps=timesteps,
                     transforms_list=[],
-                    concat_time_channels=mode == "cnn",
+                    concat_time_channels="cnn" in mode,
                 ),
             )
             val_workers = math.ceil(len(val_set) / batch_size)
@@ -133,7 +149,9 @@ def compare(mode: str = "snn", trans: list = []):
             print(f"|TRAIN SET|={len(train_set)}")
             print(f"|VAL SET|={len(val_set)}")
 
-            acc = train(train_loader, val_loader, fold_number, dataset, trans, mode=mode)
+            acc = train(
+                train_loader, val_loader, fold_number, dataset, trans, mode=mode
+            )
             accs[fold_number] = acc
             glob_accs.append(acc)
 
@@ -169,14 +187,14 @@ if __name__ == "__main__":
         if acc >= best_acc:
             best_acc = acc
             best_tran = list(curr)
-            
-    print('BEST TRANS IS', best_tran)
-    
+
+    print("BEST TRANS IS", best_tran)
+
     curr = [*best_tran, "transrot"]
     compare(mode="snn", trans=curr)
-    
+
     curr = [*best_tran, "event_drop_2"]
     compare(mode="snn", trans=curr)
-    
+
     curr = [*best_tran, "transrot", "event_drop_2"]
     compare(mode="snn", trans=curr)
