@@ -28,7 +28,7 @@ if os.path.exists("data/FerDVS"):
     timesteps = 12
     ckpt = "experiments/snn_dvsgesture.pt"
     
-    if not os.path.exist(ckpt):
+    if not os.path.exists(ckpt):
         ckpt = -1
 else:
     data_dir = "/datas/sandbox"
