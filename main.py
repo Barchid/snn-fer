@@ -27,6 +27,9 @@ if os.path.exists("data/FerDVS"):
     data_dir = "data"
     timesteps = 12
     ckpt = "experiments/snn_dvsgesture.pt"
+    
+    if not os.path.exist(ckpt):
+        ckpt = -1
 else:
     data_dir = "/datas/sandbox"
     ckpt = None
@@ -175,6 +178,12 @@ if __name__ == "__main__":
     # seeds the random from numpy, pytorch, etc for reproductibility
     pl.seed_everything(1234)
 
+    mode = "snn"
+    if ckpt == -1:
+        mode = "cnn"
+    else:
+        mode = "snn"
+    
     poss_trans = list(
         powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop"])
     )
@@ -183,7 +192,7 @@ if __name__ == "__main__":
     best_acc = -1
     best_tran = []
     for curr in poss_trans:
-        acc = compare(mode="snn", trans=list(curr))
+        acc = compare(mode=mode, trans=list(curr))
         if acc >= best_acc:
             best_acc = acc
             best_tran = list(curr)
@@ -191,10 +200,10 @@ if __name__ == "__main__":
     print("BEST TRANS IS", best_tran)
 
     curr = [*best_tran, "transrot"]
-    compare(mode="snn", trans=curr)
+    compare(mode=mode, trans=curr)
 
     curr = [*best_tran, "event_drop_2"]
-    compare(mode="snn", trans=curr)
+    compare(mode=mode, trans=curr)
 
     curr = [*best_tran, "transrot", "event_drop_2"]
-    compare(mode="snn", trans=curr)
+    compare(mode=mode, trans=curr)
