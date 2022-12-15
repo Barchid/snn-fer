@@ -51,7 +51,7 @@ def train(
         mode=mode,
     )
     
-    if ckpt is not None:
+    if ckpt is not None and ckpt != -1:
         print('Load CHECKPOINT')
         module.model.encoder.load_state_dict(torch.load(ckpt), strict=False)
     
