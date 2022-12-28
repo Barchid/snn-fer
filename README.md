@@ -7,6 +7,12 @@ Use this seed to start new deep learning / ML projects.
 - Badges
 - Bibtex
 
+
++ emd = diff entre spike trains
++ augmenter la variance des spikes trains dans la même popu
+  + variance des spike trains (plus intéressant ici)
+  + 
+
 #### Goals  
 The goal of this seed is to structure ML paper-code the same so that work can easily be extended and replicated.   
 

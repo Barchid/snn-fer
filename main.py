@@ -184,26 +184,28 @@ if __name__ == "__main__":
     else:
         mode = "snn"
     
-    poss_trans = list(
-        powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop"])
-    )
-    print(len(poss_trans))
+    # poss_trans = list(
+    #     powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop"])
+    # )
+    # print(len(poss_trans))
 
-    best_acc = -1
-    best_tran = []
-    for curr in poss_trans:
-        acc = compare(mode=mode, trans=list(curr))
-        if acc >= best_acc:
-            best_acc = acc
-            best_tran = list(curr)
+    # best_acc = -1
+    # best_tran = []
+    # for curr in poss_trans:
+    #     acc = compare(mode=mode, trans=list(curr))
+    #     if acc >= best_acc:
+    #         best_acc = acc
+    #         best_tran = list(curr)
 
-    print("BEST TRANS IS", best_tran)
+    # print("BEST TRANS IS", best_tran)
+    
+    
 
-    curr = [*best_tran, "transrot"]
+    curr = ['flip', 'background_activity', 'flip_polarity', 'transrot']
     compare(mode=mode, trans=curr)
 
-    curr = [*best_tran, "event_drop_2"]
+    curr = ['flip', 'background_activity', 'flip_polarity', 'event_drop_2']
     compare(mode=mode, trans=curr)
 
-    curr = [*best_tran, "transrot", "event_drop_2"]
+    curr = ['flip', 'background_activity', 'flip_polarity', 'transrot', 'event_drop_2']
     compare(mode=mode, trans=curr)
