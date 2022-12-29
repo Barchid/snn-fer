@@ -201,11 +201,11 @@ if __name__ == "__main__":
     
     
 
-    curr = ['flip', 'background_activity', 'flip_polarity', 'transrot']
-    compare(mode=mode, trans=curr)
+    # curr = ['flip', 'background_activity', 'flip_polarity', 'transrot']
+    # compare(mode=mode, trans=curr)
 
     curr = ['flip', 'background_activity', 'flip_polarity', 'event_drop_2']
     compare(mode=mode, trans=curr)
 
-    curr = ['flip', 'background_activity', 'flip_polarity', 'transrot', 'event_drop_2']
-    compare(mode=mode, trans=curr)
+    # curr = ['flip', 'background_activity', 'flip_polarity', 'transrot', 'event_drop_2']
+    # compare(mode=mode, trans=curr)
