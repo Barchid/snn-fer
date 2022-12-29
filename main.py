@@ -182,7 +182,7 @@ if __name__ == "__main__":
     if ckpt == -1:
         mode = "cnn"
     else:
-        mode = "snn"
+        mode = "snn50"
     
     # poss_trans = list(
     #     powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop"])
