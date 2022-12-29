@@ -551,16 +551,14 @@ class MultiStepSEWResNet(nn.Module):
             **kwargs,
         )
 
-        # TODO: edit layer4 to have a LIAF layer at the end
-        # self.layer4[-1].sn2 = MultiStepLIAFNode(
-        #     torch.nn.ReLU(), threshold_related=False, detach_reset=True, surrogate_function=surrogate.ATan()
-        # )
-
-        # if output_all:
-        #     self.fc = nn.Linear(16 * 512 * block.expansion, 512 * block.expansion)
-        # else:
         self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
-        self.fc = nn.Linear(512 * block.expansion, 512 * block.expansion)
+        
+        # CHANGE HERE TODO
+        # self.fc = nn.Linear(512 * block.expansion, 512 * block.expansion)
+        self.fc = nn.Sequential(
+            nn.Linear(512 * block.expansion, 512 * block.expansion),
+            nn.Dropout()
+        )
         self.final_neurons = MultiStepIFNode(
             v_threshold=1.0 if output_all else float("inf"),
             v_reset=0.0,
