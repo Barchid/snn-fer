@@ -33,7 +33,7 @@ class SNNModule(nn.Module):
 def get_encoder_snn(in_channels: int, T: int, output_all: bool, mode="snn"):
     if "50" in mode:
         resnet = sew_resnet.MultiStepSEWResNet(
-            block=sew_resnet.MultiStepBasicBlock,
+            block=sew_resnet.MultiStepBottleneck,
             layers=[3, 4, 6, 3],
             zero_init_residual=True,
             T=T,
