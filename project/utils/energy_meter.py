@@ -1,8 +1,12 @@
+import os
+from spikingjelly.clock_driven import functional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
+from torch.utils.data.dataloader import DataLoader
+from project.models.sew_resnet import MultiStepSEWResNet
 
 # see Table IV of https://arxiv.org/pdf/2110.07742.pdf
 ENERGY_CMOS_45NM = {
@@ -36,10 +40,27 @@ class EnergyMeter(object):
         self.k = float(k)
         self.O = float(O)
 
+        # accumulators
+        self.total_flops_snn = 0.
+        self.total_flops_ann = 0.
+        self.total_E_ANN = 0.
+        self.total_E_SNN = 0.
+        self.total_spike_rate = 0.
+
     def hook_save_spikes(self, module, input, output):
         spikes = output.detach().cpu().numpy()
-        self.neuron_number = spikes.size
         self.spike_count = np.count_nonzero(spikes)
+        self.neuron_number = spikes.size
+        self.get_energy()
+
+    # def hook_save_spikes(self, module, input, output):
+
+    #     spikes = output[0].detach().cpu().numpy()
+    #     if self.neuron_number is None:
+    #         self.neuron_number = spikes.size
+    #         self.spike_count = np.count_nonzero(spikes)
+    #     else:
+    #         self.spike_count = self.spike_count + np.count_nonzero(spikes)
 
     def get_energy(self):
         spike_rate = self.spike_count / self.neuron_number
@@ -53,7 +74,14 @@ class EnergyMeter(object):
         E_SNN = flops_snn * ENERGY_CMOS_45NM['E_AC']
 
         # reinitialize after computation
-        self.neuron_number = None
+        self.neuron_number = 0
         self.spike_count = 0
+
+        # add to total
+        self.total_flops_snn += flops_snn
+        self.total_flops_ann += flops_ann
+        self.total_E_ANN += E_ANN
+        self.total_E_SNN += E_SNN
+        self.total_spike_rate += spike_rate
 
         return flops_snn, flops_ann, E_ANN, E_SNN, spike_rate
