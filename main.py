@@ -51,7 +51,7 @@ def train(
         mode=mode,
     )
     
-    if ckpt is not None and ckpt != -1:
+    if ckpt is not None and ckpt != -1 and "snn" in mode:
         print('Load CHECKPOINT')
         module.model.encoder.load_state_dict(torch.load(ckpt), strict=False)
     
@@ -70,7 +70,7 @@ def train(
         gpus=torch.cuda.device_count(),
         callbacks=[
             checkpoint_callback,
-            EarlyStopping(monitor="val_acc", mode="max", patience=50),
+            # EarlyStopping(monitor="val_acc", mode="max", patience=50),
         ],
         logger=pl.loggers.TensorBoardLogger(
             "experiments/", name=f"{dataset}_{fold_number}"
@@ -91,7 +91,7 @@ def train(
         report.close()
         return -1
 
-    report = open(f"report_{dataset}.txt", "a")
+    report = open(f"report_{mode}_{dataset}.txt", "a")
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
     report.write(
@@ -161,7 +161,7 @@ def compare(mode: str = "snn", trans: list = []):
         report = open(f"report_{dataset}.txt", "a")
         now = datetime.now()
         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        report.write(f"{dt_string} Mean of folds = {accs.mean()}\n\n")
+        report.write(f"{dt_string} Mean of folds = {accs.mean()} | STD = {accs.std()}\n\n")
         report.flush()
         report.close()
 
@@ -181,8 +181,6 @@ if __name__ == "__main__":
     mode = "snn"
     if ckpt == -1:
         mode = "cnn"
-    else:
-        mode = "snn50"
     
     # poss_trans = list(
     #     powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop"])
@@ -204,8 +202,23 @@ if __name__ == "__main__":
     # curr = ['flip', 'background_activity', 'flip_polarity', 'transrot']
     # compare(mode=mode, trans=curr)
 
-    curr = ['flip', 'background_activity', 'flip_polarity', 'event_drop_2']
+    curr = ['event_drop_2']
     compare(mode=mode, trans=curr)
+    
+    curr = ['transrot']
+    compare(mode=mode, trans=curr)
+    
+    curr = ['event_drop_2', 'transrot']
+    compare(mode=mode, trans=curr)
+    
+    curr = ['event_drop_2']
+    compare(mode="cnn", trans=curr)
+    
+    curr = ['transrot']
+    compare(mode="cnn", trans=curr)
+    
+    curr = ['event_drop_2', 'transrot']
+    compare(mode="cnn", trans=curr)
 
     # curr = ['flip', 'background_activity', 'flip_polarity', 'transrot', 'event_drop_2']
     # compare(mode=mode, trans=curr)

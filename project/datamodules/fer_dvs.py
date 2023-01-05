@@ -9,7 +9,7 @@ class FerDVS(Dataset):
     sensor_size = (200, 200, 2)
     dtype = np.dtype([("x", np.int16), ("y", np.int16), ("p", bool), ("t", np.int64)])
     ordering = dtype.names
-    available_datasets = ("CKPlusDVS", "ADFESDVS", "CASIADVS", "MMIDVS", "SNAPDVS")
+    available_datasets = ("CKPlusDVS", "ADFESDVS", "CASIADVS", "MMIDVS")#, "SNAPDVS")
     classes = [
         "happy",
         "fear",
