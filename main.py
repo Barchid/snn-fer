@@ -27,7 +27,7 @@ if os.path.exists("data/FerDVS"):
     data_dir = "data"
     timesteps = 12
     ckpt = "experiments/snn_dvsgesture.pt"
-    
+
     if not os.path.exists(ckpt):
         ckpt = -1
 else:
@@ -50,11 +50,10 @@ def train(
         epochs=epochs,
         mode=mode,
     )
-    
+
     if ckpt is not None and ckpt != -1 and "snn" in mode:
-        print('Load CHECKPOINT')
+        print("Load CHECKPOINT")
         module.model.encoder.load_state_dict(torch.load(ckpt), strict=False)
-    
 
     # saves the best model checkpoint based on the accuracy in the validation set
     checkpoint_callback = pl.callbacks.ModelCheckpoint(
@@ -161,7 +160,9 @@ def compare(mode: str = "snn", trans: list = []):
         report = open(f"report_{dataset}.txt", "a")
         now = datetime.now()
         dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-        report.write(f"{dt_string} Mean of folds = {accs.mean()} | STD = {accs.std()}\n\n")
+        report.write(
+            f"{dt_string} Mean of folds = {accs.mean()} | STD = {accs.std()}\n\n"
+        )
         report.flush()
         report.close()
 
@@ -181,7 +182,7 @@ if __name__ == "__main__":
     mode = "snn"
     if ckpt == -1:
         mode = "cnn"
-    
+
     # poss_trans = list(
     #     powerset(["flip", "background_activity", "reverse", "flip_polarity", "crop"])
     # )
@@ -196,28 +197,41 @@ if __name__ == "__main__":
     #         best_tran = list(curr)
 
     # print("BEST TRANS IS", best_tran)
-    
-    
 
     # curr = ['flip', 'background_activity', 'flip_polarity', 'transrot']
     # compare(mode=mode, trans=curr)
 
-    curr = ['event_drop_2']
-    compare(mode=mode, trans=curr)
-    
-    curr = ['transrot']
-    compare(mode=mode, trans=curr)
-    
-    curr = ['event_drop_2', 'transrot']
-    compare(mode=mode, trans=curr)
-    
-    curr = ['event_drop_2']
+    # cnn
+    curr = ["flip", "background_activity", "crop", "mirror"]
+    compare(mode="snn", trans=curr)
+
+    curr = ["flip", "background_activity", "crop", "event_drop_2", "mirror"]
+    compare(mode="snn", trans=curr)
+
+    curr = ["flip", "background_activity", "crop", "mirror"]
     compare(mode="cnn", trans=curr)
-    
-    curr = ['transrot']
+
+    curr = ["flip", "background_activity", "crop", "event_drop_2", "mirror"]
     compare(mode="cnn", trans=curr)
+
+    exit()
     
-    curr = ['event_drop_2', 'transrot']
+    curr = ["event_drop_2"]
+    compare(mode=mode, trans=curr)
+
+    curr = ["transrot"]
+    compare(mode=mode, trans=curr)
+
+    curr = ["event_drop_2", "transrot"]
+    compare(mode=mode, trans=curr)
+
+    curr = ["event_drop_2"]
+    compare(mode="cnn", trans=curr)
+
+    curr = ["transrot"]
+    compare(mode="cnn", trans=curr)
+
+    curr = ["event_drop_2", "transrot"]
     compare(mode="cnn", trans=curr)
 
     # curr = ['flip', 'background_activity', 'flip_polarity', 'transrot', 'event_drop_2']

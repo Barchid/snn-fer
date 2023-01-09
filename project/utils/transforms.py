@@ -26,6 +26,7 @@ from project.utils.transform_dvs import (
     get_frame_representation,
 )
 
+
 class DVSTransform:
     def __init__(
         self,
@@ -114,6 +115,9 @@ class DVSTransform:
 
         if "cutout" in transforms_list:
             trans.append(transforms.RandomApply([Cutout()], p=0.3))
+
+        if "mirror" in transforms_list:
+            trans.append(transforms.RandomApply([FaceMirror()], p=0.5))
 
         # finish by concatenating polarity and timesteps
         if concat_time_channels:
@@ -240,5 +244,21 @@ class Cutout:
 
         # drop events where the
         frames[mask == 0] = 0.0
+
+        return frames
+
+
+@dataclass(frozen=True)
+class FaceMirror:
+    def __call__(self, frames: torch.Tensor):  # shape (T, C, H, W)
+        W = frames.shape[-1]
+        if random.random() >= 0.5:  # left
+            left = frames[:, :, :, 0 : W // 2]
+            new_right = functional.hflip(left)
+            frames[:, :, :, W // 2 :] = new_right
+        else:  # right
+            right = frames[:, :, :, W // 2 :]
+            new_left = functional.hflip(right)
+            frames[:, :, :, 0 : W // 2] = new_left
 
         return frames
