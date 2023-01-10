@@ -204,10 +204,10 @@ class DynamicTranslation:
 
 @dataclass(frozen=True)
 class TransRot:
-    dyn_tran = DynamicTranslation()
-    dyn_rot = DynamicRotation()
-    stat_tran = transforms.RandomAffine(0, translate=(0.2, 0.2))
-    stat_rot = transforms.RandomRotation(75)
+    dyn_tran = DynamicTranslation(translate=(0.05, 0.05))
+    dyn_rot = DynamicRotation(degrees=(-7,7))
+    stat_tran = transforms.RandomAffine(0, translate=(0.05, 0.5))
+    stat_rot = transforms.RandomRotation(7)
 
     def __call__(self, frames: torch.Tensor):
         choice = np.random.randint(0, 5)
