@@ -17,10 +17,10 @@ import math
 from itertools import chain, combinations
 import numpy as np
 
-batch_size = 32
+batch_size = 32 
 learning_rate = 5e-3
 timesteps = 8
-epochs = 1000
+epochs = 500
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 if os.path.exists("data/FerDVS"):
